@@ -9,15 +9,11 @@ PUBLISH_WORKFLOW_FILE=".github/workflows/publish.yml"
 ACT_WORKFLOW_FILE=".github/workflows/act.yml"
 MAKEFILE_WORKFLOW_FILE=".github/workflows/makefile-ci.yml"
 SMOKETEST_BASE_UBUNTU_WORKFLOW_FILE=".github/workflows/smoke-base-ubuntu.yaml"
-SMOKETEST_BASE_NRF_WORKFLOW_FILE=".github/workflows/smoke-base-nrf.yaml"
-SMOKETEST_NRF_CI_WORKFLOW_FILE=".github/workflows/smoke-nrf-ci.yaml"
 
 # Event files
-CREATE_TAG_EVENT_FILE=".github/workflows/act/event-create-tag.json"
 PUSH_TAG_EVENT_FILE=".github/workflows/act/event-push-tag.json"
 PUSH_COMMIT_EVENT_FILE=".github/workflows/act/event-push-commit.json"
 PR_OPEN_EVENT_FILE=".github/workflows/act/event-pr-opened.json"
-PR_MERGE_MAIN_EVENT_FILE=".github/workflows/act/event-publish-main-merged.json"
 
 # Function to run act --dryrun and check for errors
 # $1: The workflow file to run
@@ -70,8 +66,6 @@ function act_dryrun_all {
   act_dryrun $MAKEFILE_WORKFLOW_FILE
   act_dryrun $MARKDOWN_WORKFLOW_FILE
   act_dryrun $SMOKETEST_BASE_UBUNTU_WORKFLOW_FILE
-  act_dryrun $SMOKETEST_BASE_NRF_WORKFLOW_FILE
-  act_dryrun $SMOKETEST_NRF_CI_WORKFLOW_FILE
   act_dryrun $ACT_WORKFLOW_FILE
   # TODO this fails
   act_dryrun $PUBLISH_WORKFLOW_FILE
@@ -95,20 +89,17 @@ function act_github_event() {
   act push --workflows $DEBUG_WORKFLOW_FILE --eventpath $PUSH_COMMIT_EVENT_FILE
   echo "🧪🧪🧪 push tag event 🧪🧪🧪"
   act push --workflows $DEBUG_WORKFLOW_FILE --eventpath $PUSH_TAG_EVENT_FILE
-  echo "🧪🧪🧪 create tag event 🧪🧪🧪"
-  act create --workflows $DEBUG_WORKFLOW_FILE --eventpath $CREATE_TAG_EVENT_FILE
   echo "🧪🧪🧪 PR open event 🧪🧪🧪"
   act pull_request --workflows $DEBUG_WORKFLOW_FILE --eventpath $PR_OPEN_EVENT_FILE
 }
 
-# Test the get_tags job
-# On tag creation, returns the tag name
-# On pull request to dev rerturn the branch name
-# On pull request merge to main or dev return base branch name
-function act_test_get_tags() {
-  echo "🧪🧪🧪 Test PR events 🧪🧪🧪"
-  # PR openend to dev
-  act pull_request --workflows $PUBLISH_WORKFLOW_FILE --job get-tags --eventpath $PR_OPEN_EVENT_FILE
+function act_test_publish_workflow() {
+  echo "🧪🧪🧪 Test publish workflow push branch event 🧪🧪🧪"
+  act push --workflows $PUBLISH_WORKFLOW_FILE --eventpath $PUSH_COMMIT_EVENT_FILE --dryrun
+  echo "🧪🧪🧪 Test publish workflow push tag event 🧪🧪🧪"
+  act push --workflows $PUBLISH_WORKFLOW_FILE --eventpath $PUSH_TAG_EVENT_FILE --dryrun
+  echo "🧪🧪🧪 Test publish workflow pull request event 🧪🧪🧪"
+  act pull_request --workflows $PUBLISH_WORKFLOW_FILE --eventpath $PR_OPEN_EVENT_FILE --dryrun
 }
 
 if [ -z $1 ]; then
@@ -116,21 +107,20 @@ if [ -z $1 ]; then
   check_env
   act_github_event
   act_dryrun_all
-  act_dryrun_event create $PUBLISH_WORKFLOW_FILE $CREATE_TAG_EVENT_FILE
-  act_test_get_tags
+  act_test_publish_workflow
 elif [ $1 == "dryrun" ]; then
   echo "Running dryrun tests"
   check_env
   act_dryrun_all
-  act_dryrun_event create $PUBLISH_WORKFLOW_FILE $CREATE_TAG_EVENT_FILE
+  act_test_publish_workflow
 elif [ $1 == "event" ]; then
   echo "Running event tests"
   check_env
   act_github_event
-elif [ $1 == "get-tags" ]; then
-  echo "Running get-tags tests"
+elif [ $1 == "publish" ]; then
+  echo "Running publish workflow tests"
   check_env
-  act_test_get_tags
+  act_test_publish_workflow
 else
   echo "🚫 Unknown argument $1"
   exit 1

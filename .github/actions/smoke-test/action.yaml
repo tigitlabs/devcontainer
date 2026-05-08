@@ -1,4 +1,5 @@
 name: 'Smoke test'
+description: 'Build and test a devcontainer image using the local smoke-test scripts'
 inputs:
   image:
     description: 'Image to test'
@@ -11,9 +12,14 @@ runs:
       id: checkout_release
       uses: actions/checkout@v3
       with:
-        repository: 'tigitlabs/dev-container'
+        repository: 'tigitlabs/devcontainer'
         path: '__build'
         ref: 'main'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
 
     - name: Build image
       id: build_image

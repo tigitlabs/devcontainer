@@ -50,6 +50,3 @@ function test {
 }
 
 build "base-ubuntu" && test "base-ubuntu"
-build "base-nrf" && test "base-nrf"
-build "nrf-ci" && test "nrf-ci"
-build "nrf-devcontainer" && test "nrf-devcontainer"

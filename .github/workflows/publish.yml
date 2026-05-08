@@ -1,104 +1,94 @@
----
-
-name: "Publish-Images"
+name: "Base Image CI"
 
 on:
   pull_request:
-    branches: [ dev, main]
-  create:
+    branches: [dev, main]
+    paths:
+      - src/base-ubuntu/**
+      - test/**
+      - .github/workflows/**
+      - .github/actions/**
+      - README.md
+      - Makefile
+  push:
+    branches: [dev, main]
+    tags: ['v*.*.*']
+    paths:
+      - src/base-ubuntu/**
+      - test/**
+      - .github/workflows/**
+      - .github/actions/**
+      - README.md
+      - Makefile
+  workflow_dispatch:
 
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  get-tags:
+  prepare-metadata:
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.get_tag_name.outputs.tag }}
+      publish: ${{ steps.plan.outputs.publish }}
+      primary_tag: ${{ steps.plan.outputs.primary_tag }}
+      additional_tags: ${{ steps.plan.outputs.additional_tags }}
     steps:
-      - name: Get tags
-        id: get_tag_name
+      - name: Plan image tags
+        id: plan
         run: |
-          if [[ "${{ github.event.ref_type }}" == 'tag' ]]; then
-            echo "Tag event detected"
-            # echo "tag=$(echo "${{ github.event.ref }}" | grep -oP 'refs/tags/\K(.+)')"
-            tag=${{ github.event.ref }}
-            # Check if the tag is a semver tag
-            if [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-              echo "tag detected: $tag"
-              echo "tag=$tag" >> $GITHUB_OUTPUT
-              echo "Set the tag to: $tag"
-            else
-              echo "tag is not a semver tag"
-              exit 1
-            fi
-          fi
-          if [[ "${{ github.ref }}" == "refs/heads/"* ]]; then
-            echo "Branch event detected"
-            tag=$(echo "${{ github.ref }}" | grep -oP 'refs/heads/\K(.+)')
-            echo "tag=$tag" >> $GITHUB_OUTPUT
-            echo "Set the tag to: $tag"
-          fi
-          if [[ "${{ github.event.pull_request.state }}" == "open" ]]; then
-            echo "Pull request open event detected"
-            echo "ℹ Pull request from ${{ github.event.pull_request.head.ref }} to ${{ github.event.pull_request.base.ref }}"
-            tag=${{ github.event.pull_request.head.ref }}
-            echo "tag=$tag" >> $GITHUB_OUTPUT
-            echo "Set the tag to: $tag"
-          fi
-          if [[ "${{ github.event.pull_request.merged }}" == "true" ]]; then
-            echo "Pull request merged event detected"
-            tag=${{ github.event.pull_request.head.ref }}
-            echo "tag=$tag" >> $GITHUB_OUTPUT
-            echo "Set the tag to: $tag"
-          fi
-          echo "Tag: ${tag}"
+          set -euo pipefail
 
-  push-base-ubuntu:
-    needs: get-tags
+          sanitize_tag() {
+            echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+//; s/-+$//'
+          }
+
+          short_sha="${GITHUB_SHA::12}"
+          publish="false"
+          primary_tag=""
+          additional_tags=""
+
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            primary_tag="$(sanitize_tag "pr-${{ github.event.pull_request.number }}-${short_sha}")"
+          elif [[ "${GITHUB_REF_TYPE}" == "branch" ]]; then
+            primary_tag="$(sanitize_tag "${GITHUB_REF_NAME}")"
+            additional_tags="sha-${short_sha}"
+            publish="true"
+
+            if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+              additional_tags="${additional_tags},latest"
+            fi
+          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            primary_tag="$(sanitize_tag "${GITHUB_REF_NAME}")"
+            additional_tags="sha-${short_sha}"
+            publish="true"
+
+            if [[ "${primary_tag}" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+              major="${BASH_REMATCH[1]}"
+              minor="${BASH_REMATCH[2]}"
+              additional_tags="${additional_tags},v${major}.${minor},v${major},latest"
+            fi
+          else
+            echo "Unsupported event or ref type"
+            exit 1
+          fi
+
+          echo "publish=${publish}" >> "$GITHUB_OUTPUT"
+          echo "primary_tag=${primary_tag}" >> "$GITHUB_OUTPUT"
+          echo "additional_tags=${additional_tags}" >> "$GITHUB_OUTPUT"
+
+  base-ubuntu:
+    needs: prepare-metadata
     permissions:
       contents: read
       packages: write
     uses: ./.github/workflows/build-test-push.yml
     with:
       image: base-ubuntu
-      tag: ${{ needs.get-tags.outputs.tag }}
-  push-base-nrf:
-    permissions:
-      contents: read
-      packages: write
-    needs: 
-      - get-tags
-      - push-base-ubuntu
-    uses: ./.github/workflows/build-test-push.yml
-    with:
-      image: base-nrf
-      tag: ${{ needs.get-tags.outputs.tag }}
-      base_image: ${{ needs.push-base-ubuntu.outputs.image_url }}
-
-  push-nrf-ci:
-    permissions:
-      contents: read
-      packages: write
-    needs: 
-      - get-tags
-      - push-base-nrf
-    uses: ./.github/workflows/build-test-push.yml
-    with:
-      image: nrf-ci
-      tag: ${{ needs.get-tags.outputs.tag }}
-      base_image: ${{ needs.push-base-nrf.outputs.image_url }}
-
-  push-nrf-devcontainer:
-    permissions:
-      contents: read
-      packages: write
-    needs: 
-      - get-tags
-      - push-base-nrf
-    uses: ./.github/workflows/build-test-push.yml
-    with:
-      image: nrf-devcontainer
-      tag: ${{ needs.get-tags.outputs.tag }}
-      base_image: ${{ needs.push-base-nrf.outputs.image_url }}
+      tag: ${{ needs.prepare-metadata.outputs.primary_tag }}
+      additional_tags: ${{ needs.prepare-metadata.outputs.additional_tags }}
+      publish: ${{ needs.prepare-metadata.outputs.publish == 'true' }}

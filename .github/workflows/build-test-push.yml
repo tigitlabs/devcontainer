@@ -13,10 +13,20 @@ on:
         description: 'Tag to apply to the image'
         required: true
         type: string
+      additional_tags:
+        description: 'Additional comma-separated tags to publish for the same image build'
+        required: false
+        type: string
+        default: ''
       base_image:
         description: 'Base image to use'
         type: string
         required: false
+      publish:
+        description: 'Whether to publish the built image to the registry'
+        required: false
+        type: boolean
+        default: false
       registry:
         description: 'Registry to push to'
         required: false
@@ -31,13 +41,18 @@ jobs:
   build-devcontainer-image:
     runs-on: ubuntu-latest
     permissions:
-          contents: read
-          packages: write
+      contents: read
+      packages: write
     outputs:
-      image_url: ${{ steps.publish_image.outputs.image_url }}
+      image_url: ${{ steps.image_metadata.outputs.image_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Install devcontainer cli
         run: |
@@ -51,13 +66,17 @@ jobs:
           ./test/pre_build.sh ${{ inputs.image }} ${{ inputs.tag }} ${{ inputs.base_image }}
 
       - name: Test the image
-        if: ${{ !env.ACT }}
         run: |
           echo "Testing the image"
           ./test/test_build.sh ${{ inputs.image }} ${{ inputs.tag }}
 
+      - name: Image metadata
+        id: image_metadata
+        run: |
+          echo "image_url=${{ inputs.registry }}/${{ github.repository }}/${{ inputs.image }}" >> "$GITHUB_OUTPUT"
+
       - name: Login to GitHub Container Registry
-        if: ${{ !env.ACT }}
+        if: ${{ inputs.publish }}
         uses: docker/login-action@v3
         with:
           registry: ${{ inputs.registry }}
@@ -65,12 +84,26 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish image
-        id: publish_image
+        if: ${{ inputs.publish }}
         run: |
-          echo "Publishing image"
-          PUBLIC_IMAGE_NAME="${{ inputs.registry }}/${{ github.event.repository.full_name }}/${{ inputs.image }}:${{ inputs.tag }}"
-          docker tag ${{ inputs.image }}:${{ inputs.tag }} $PUBLIC_IMAGE_NAME
-          docker rmi ${{ inputs.image }}:${{ inputs.tag }}
-          docker push $PUBLIC_IMAGE_NAME
-          echo "Image available at: $PUBLIC_IMAGE_NAME"
-          echo "image_url=${{ inputs.registry }}/${{ github.event.repository.full_name }}/${{ inputs.image }}" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          image_name="${{ inputs.image }}:${{ inputs.tag }}"
+          published_image="${{ inputs.registry }}/${{ github.repository }}/${{ inputs.image }}"
+
+          echo "Publishing ${image_name} to ${published_image}"
+          docker tag "${image_name}" "${published_image}:${{ inputs.tag }}"
+          docker push "${published_image}:${{ inputs.tag }}"
+
+          if [[ -n "${{ inputs.additional_tags }}" ]]; then
+            IFS=',' read -ra extra_tags <<< "${{ inputs.additional_tags }}"
+            for tag in "${extra_tags[@]}"; do
+              tag="$(echo "${tag}" | xargs)"
+              if [[ -z "${tag}" || "${tag}" == "${{ inputs.tag }}" ]]; then
+                continue
+              fi
+
+              docker tag "${image_name}" "${published_image}:${tag}"
+              docker push "${published_image}:${tag}"
+            done
+          fi

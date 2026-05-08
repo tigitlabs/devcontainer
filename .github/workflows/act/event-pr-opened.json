@@ -182,8 +182,8 @@
       "diff_url": "https://github.com/tigitlabs/dev-container/pull/120.diff",
       "draft": false,
       "head": {
-        "label": "tigitlabs:feat-publish-nrf-devcontainer",
-        "ref": "feat-publish-nrf-devcontainer",
+        "label": "tigitlabs:feat-publish-base-ubuntu",
+        "ref": "feat-publish-base-ubuntu",
         "repo": {
           "allow_auto_merge": true,
           "allow_forking": true,
@@ -341,7 +341,7 @@
       "review_comments_url": "https://api.github.com/repos/tigitlabs/dev-container/pulls/120/comments",
       "state": "open",
       "statuses_url": "https://api.github.com/repos/tigitlabs/dev-container/statuses/6f7822956b6ce429028d7cd5f9876f8ddf441ab8",
-      "title": "Feat publish nrf-devcontainer",
+      "title": "Feat publish base-ubuntu",
       "updated_at": "2023-11-22T17:09:35Z",
       "url": "https://api.github.com/repos/tigitlabs/dev-container/pulls/120",
       "user": {

@@ -1,0 +1,9 @@
+[submodule "external/template-starter"]
+	path = external/template-starter
+	url = https://github.com/devcontainers/template-starter.git
+[submodule "external/templates"]
+	path = external/templates
+	url = https://github.com/devcontainers/templates.git
+[submodule "external/images"]
+	path = external/images
+	url = https://github.com/devcontainers/images.git

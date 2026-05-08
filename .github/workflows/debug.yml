@@ -5,6 +5,7 @@ name: "Debug Action"
 on:
   push:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited, closed]
   pull_request_review:
   pull_request_review_comment:
   pull_request_target:
@@ -13,12 +14,12 @@ on:
   delete:
   label:
   issues:
+  issue_comment:
   branch_protection_rule:
   deployment:
   deployment_status:
   discussion:
   discussion_comment:
-  issue_comment:
   gollum:
   merge_group:
   milestone:
@@ -44,12 +45,17 @@ jobs:
           echo "GITHUB_EVENT_NAME=${{ github.event_name }}"
           # https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
           echo "action: ${{ github.event.action }}"
+          echo "title: ${{ github.event.pull_request.title }}"
+          echo "ℹ Pull request from ${{ github.event.pull_request.head.ref }} to ${{ github.event.pull_request.base.ref }}"
+          echo "assignee.login: ${{ github.event.assignee.login }}"
           echo "merged: ${{ github.event.pull_request.merged }}"
           echo "number: ${{ github.event.pull_request.number }}"
-          echo "title: ${{ github.event.pull_request.title }}"
           echo "state: ${{ github.event.pull_request.state }}"
           echo "base.ref": ${{ github.event.pull_request.base.ref }}
           echo "head.ref: ${{ github.event.pull_request.head.ref }}"
+          echo "locked: ${{ github.event.pull_request.locked }}"
+          echo "active_lock_reason: ${{ github.event.pull_request.active_lock_reason }}"
+          echo "auto_merge.method: ${{ github.event.pull_request.auto_merge.method }}"
 
       - name: push
         if: github.event_name == 'push'
@@ -66,6 +72,7 @@ jobs:
           echo "description: ${{ github.event.description }}"
           echo "forced: ${{ github.event.forced }}"
           echo "head_commit.author.name: ${{ github.event.head_commit.author.name }}"
+          echo "head_commit.message: ${{ github.event.head_commit.message }}"
           echo "pusher.name: ${{ github.event.pusher.name }}"
           echo "ref: ${{ github.event.ref }}"
           echo "repository.full_name: ${{ github.event.repository.full_name }}"
