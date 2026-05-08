@@ -17,7 +17,7 @@ absolute_root_dir="$(cd "${script_dir}/.." && pwd)"
 echo "absolute_root_dir: ${absolute_root_dir}"
 echo "script_dir: ${script_dir}"
 image_name="${IMAGE}:${IMAGE_TAG}"
-id_label=" dev.containers.name=${IMAGE}"
+id_label="dev.containers.name=${IMAGE}"
 
 # Run and test container
 echo "(*) Run and Test container - ${image_name}:${IMAGE_TAG}"
