@@ -1,4 +1,4 @@
-# dev-container
+# devcontainer
 
 Repo to maintain and pre-build devcontainer images.
 The images can be used locally or on Github via Codespaces.

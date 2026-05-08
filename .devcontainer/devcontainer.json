@@ -9,17 +9,14 @@
   "initializeCommand": ".devcontainer/initializeCommand.sh",
   "postCreateCommand": ".devcontainer/postCreateCommand.sh",
   "postStartCommand": ".devcontainer/postStartCommand.sh",
-  "onCreateCommand": "npm install -g @devcontainers/cli",
+  "onCreateCommand": ".devcontainer/onCreateCommand.sh",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": "true",
+      "installZsh": "false",
       "username": "vscode",
       "userUid": "1000",
       "userGid": "1000",
       "upgradePackages": "true"
-    },
-    "ghcr.io/devcontainers/features/sshd:1": {
-        "version": "latest"
     },
     "ghcr.io/devcontainers/features/git:1": {
       "version": "latest",
@@ -32,30 +29,11 @@
       "version": "latest",
       "dockerDashComposeVersion": "v2"
     },
-    "ghcr.io/devcontainers/features/conda:1": {
-      "addCondaForge": true,
-      "version": "4.12.0"
-    },
     "ghcr.io/devcontainers/features/github-cli:1": {
       "installDirectlyFromGitHubRelease": true,
       "version": "latest"
-    },
-    "ghcr.io/devcontainers-contrib/features/act:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers-contrib/features/actionlint:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers-contrib/features/flake8:2": {
-      "version": "latest",
-      "plugins": "flake8-black flake8-isort flake8-print flake8-bandit flake8-pylint flake8-builtins flake8-spellcheck flake8-pytest-style flake8-django flake8-fastapi"
-    },
-    "ghcr.io/devcontainers-contrib/features/pylint:2": {
-      "version": "latest"
-    },
-    // This is needed to install the devconainer-cli
-    "ghcr.io/devcontainers/features/node:1": {}
-    },
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -63,11 +41,7 @@
         "github.vscode-pull-request-github",
         "gitHub.copilot",
         "gitHub.copilot-chat",
-        "ms-azuretools.vscode-docker",
-        "mutantdino.resourcemonitor",
-        "eamodio.gitlens",
         "DavidAnson.vscode-markdownlint",
-        "ms-vscode-remote.remote-containers",
         "streetsidesoftware.code-spell-checker"
       ]
     }
