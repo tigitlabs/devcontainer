@@ -29,7 +29,6 @@ jobs:
           echo "action: ${{ github.event.action }}"
           echo "title: ${{ github.event.pull_request.title }}"
           echo "ℹ Pull request from ${{ github.event.pull_request.head.ref }} to ${{ github.event.pull_request.base.ref }}"
-          echo "assignee.login: ${{ github.event.assignee.login }}"
           echo "merged: ${{ github.event.pull_request.merged }}"
           echo "number: ${{ github.event.pull_request.number }}"
           echo "state: ${{ github.event.pull_request.state }}"
@@ -37,7 +36,6 @@ jobs:
           echo "head.ref: ${{ github.event.pull_request.head.ref }}"
           echo "locked: ${{ github.event.pull_request.locked }}"
           echo "active_lock_reason: ${{ github.event.pull_request.active_lock_reason }}"
-          echo "auto_merge.method: ${{ github.event.pull_request.auto_merge.method }}"
           if [[ "${{ github.event.pull_request.state }}" == "open" ]]; then
             echo "Pull request open event detected"
             echo "ℹ Pull request from ${{ github.event.pull_request.head.ref }} to ${{ github.event.pull_request.base.ref }}"
@@ -80,41 +78,3 @@ jobs:
     with:
       image: base-ubuntu
       tag: ${{ needs.get-tags.outputs.tag }}
-  push-base-nrf:
-    permissions:
-      contents: read
-      packages: write
-    needs: 
-      - get-tags
-      - push-base-ubuntu
-    uses: ./.github/workflows/build-test-push.yml
-    with:
-      image: base-nrf
-      tag: ${{ needs.get-tags.outputs.tag }}
-      base_image: ${{ needs.push-base-ubuntu.outputs.image_url }}
-
-  push-nrf-ci:
-    permissions:
-      contents: read
-      packages: write
-    needs: 
-      - get-tags
-      - push-base-nrf
-    uses: ./.github/workflows/build-test-push.yml
-    with:
-      image: nrf-ci
-      tag: ${{ needs.get-tags.outputs.tag }}
-      base_image: ${{ needs.push-base-nrf.outputs.image_url }}
-
-  push-nrf-devcontainer:
-    permissions:
-      contents: read
-      packages: write
-    needs: 
-      - get-tags
-      - push-base-nrf
-    uses: ./.github/workflows/build-test-push.yml
-    with:
-      image: nrf-devcontainer
-      tag: ${{ needs.get-tags.outputs.tag }}
-      base_image: ${{ needs.push-base-nrf.outputs.image_url }}

@@ -9,8 +9,6 @@ PUBLISH_WORKFLOW_FILE=".github/workflows/publish.yml"
 ACT_WORKFLOW_FILE=".github/workflows/act.yml"
 MAKEFILE_WORKFLOW_FILE=".github/workflows/makefile-ci.yml"
 SMOKETEST_BASE_UBUNTU_WORKFLOW_FILE=".github/workflows/smoke-base-ubuntu.yaml"
-SMOKETEST_BASE_NRF_WORKFLOW_FILE=".github/workflows/smoke-base-nrf.yaml"
-SMOKETEST_NRF_CI_WORKFLOW_FILE=".github/workflows/smoke-nrf-ci.yaml"
 
 # Event files
 CREATE_TAG_EVENT_FILE=".github/workflows/act/event-create-tag.json"
@@ -70,8 +68,6 @@ function act_dryrun_all {
   act_dryrun $MAKEFILE_WORKFLOW_FILE
   act_dryrun $MARKDOWN_WORKFLOW_FILE
   act_dryrun $SMOKETEST_BASE_UBUNTU_WORKFLOW_FILE
-  act_dryrun $SMOKETEST_BASE_NRF_WORKFLOW_FILE
-  act_dryrun $SMOKETEST_NRF_CI_WORKFLOW_FILE
   act_dryrun $ACT_WORKFLOW_FILE
   # TODO this fails
   act_dryrun $PUBLISH_WORKFLOW_FILE

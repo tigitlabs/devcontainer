@@ -60,19 +60,7 @@ This enables SSH access to a Github Actions runner.
 
 ### base-ubuntu
 
-Used as the base image for all other devcontainers.
-
-## base-nrf
-
-Build on top of base-ubuntu.
-Only used as a base for nrf-ci and nrf-devcontainer builds
-Only tools to build nrf connect SDK examples based on Zephyr are installed.
-
-<https://devzone.nordicsemi.com/guides/nrf-connect-sdk-guides/b/getting-started/posts/build-ncs-application-firmware-images-using-docker>
-
-## nrf-codespace
-
-Based on this [repo from Nordic](https://github.com/NordicPlayground/nrf-docker)
+Current focus is a single published base image. Additional project-specific images will be added later on top of this foundation.
 
 ## Setup for Host Machine
 
