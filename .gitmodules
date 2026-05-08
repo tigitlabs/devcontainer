@@ -4,3 +4,6 @@
 [submodule "external/templates"]
 	path = external/templates
 	url = https://github.com/devcontainers/templates.git
+[submodule "external/images"]
+	path = external/images
+	url = https://github.com/devcontainers/images.git
