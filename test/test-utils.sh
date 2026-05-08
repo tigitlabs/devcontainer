@@ -162,6 +162,8 @@ checkCommon()
         libstdc++6 \
         zlib1g \
         locales \
+        age \
+        ripgrep \
         sudo"
 
     # Actual tests

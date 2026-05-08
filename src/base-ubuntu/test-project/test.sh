@@ -1,7 +1,7 @@
 #!/bin/bash
 cd $(dirname "$0")
 
-source ../../../test/test-utils.sh  ubuntu
+source ../../../test/test-utils.sh  vscode
 
 # Run common tests
 checkCommon
@@ -19,6 +19,14 @@ check "gitconfig-file-location" sh -c "ls /etc/gitconfig"
 check "gitconfig-contains-name" sh -c "cat /etc/gitconfig | grep 'name = devcontainers'"
 
 check "usr-local-etc-config-does-not-exist" test ! -f "/usr/local/etc/gitconfig"
+
+check "mise" mise --version
+check "mise-install-location" test -x "$HOME/.local/bin/mise"
+check "mise-on-path" sh -c '[ "$(command -v mise)" = "$HOME/.local/bin/mise" ]'
+check "mise-data-dir" test -d "$HOME/.local/share/mise"
+check "mise-config-dir" test -d "$HOME/.config/mise"
+check "mise-cache-dir" test -d "$HOME/.cache/mise"
+
 checkPythonExtension
 
 # Report result
