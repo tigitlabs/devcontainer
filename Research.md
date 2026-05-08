@@ -42,7 +42,8 @@
 - `devcontainers/images`
   - Repo: [https://github.com/devcontainers/images](https://github.com/devcontainers/images)
   - Local submodule: `external/images`
-  - Purpose: the maintained set of reusable base development container images that templates and devcontainer configurations can build on.
+  - Purpose: the maintained set of reusable base development container images
+    that templates and devcontainer configurations can build on.
   - What it is useful for:
     - Reference implementation for base image design and maintenance.
     - Shows how reusable images differ from higher-level templates.
@@ -63,31 +64,39 @@
 
 - Use `external/template-starter` when defining the baseline authoring pattern for new templates in this repository.
 - Use `external/templates` when comparing our structure against a larger, production-maintained catalog.
-- Use `external/images` when deciding what should become a reusable base image versus what should stay in a template or project config.
+- Use `external/images` when deciding what should become a reusable base image
+  versus what should stay in a template or project config.
 - Borrow structure and workflow ideas, but avoid copying unnecessary complexity until this repo needs it.
-- Compare our `src/` and `test/` layout against the template references, and compare any shared runtime setup against the images reference.
+- Compare our `src/` and `test/` layout against the template references,
+  and compare any shared runtime setup against the images reference.
 
 ## Decision rules
 
 - Use a custom image when the goal is a reusable environment that many projects can pull directly.
 - Use a template when the goal is to generate or apply `.devcontainer` configuration into a project repository.
 - Use an image for stable toolchains and heavy shared dependencies that should not be rebuilt per project.
-- Use a template for project bootstrapping, opinionated defaults, and wiring a project to an image, features, mounts, or editor settings.
-- Use Features when a concern is modular and optional, and you may want to compose it differently across projects.
+- Use a template for project bootstrapping, opinionated defaults, and wiring a
+  project to an image, features, mounts, or editor settings.
+- Use Features when a concern is modular and optional, and you may want to
+  Compose it differently across projects.
 
 ## Recommended approach for this repo
 
 - Primary path: build and publish a small hierarchy of custom base images.
 - Suggested image stack:
   - `base`: your default shell, CLI tools, editors, git tooling, and other personal baseline utilities.
-  - `python`: extends `base` with Python runtime, packaging tools, linters, and common data or app dependencies.
+  - `python`: extends `base` with Python runtime, packaging tools, linters,
+    and common data or app dependencies.
   - `fw-dev`: extends `base` with firmware and embedded toolchains, debug tools, and device-specific utilities.
 - Optional next layer: add lightweight templates that reference those published images for fast project onboarding.
-- Keep templates thin. Their job should be selecting the right image and adding project-specific `devcontainer.json` defaults, not rebuilding your whole environment.
+- Keep templates thin. Their job should be selecting the right image and adding
+  project-specific `devcontainer.json` defaults, not rebuilding your whole
+  environment.
 
 ## Practical recommendation
 
-- If your main goal is "I want images I can pull for different kinds of projects", the image approach is the right foundation.
+- If your main goal is "I want images I can pull for different kinds of
+  projects", the image approach is the right foundation.
 - The `devcontainers/images` repo is the better reference for structure, layering, Dockerfile discipline, and publishing patterns.
 - The template repos are still useful, but as a second step after the image strategy is in place.
 - Do not start by forcing everything into templates. Templates are not a replacement for a reusable published image catalog.
@@ -97,12 +106,14 @@
 - A template is a reusable starter package that writes dev container files into a project.
 - It helps a user say "set this repo up as a Python dev container" or "apply this firmware dev environment scaffold".
 - A template can reference a published image, a Dockerfile, or additional Features.
-- Templates are best when multiple repositories need the same onboarding flow, not when the main asset is the built environment itself.
+- Templates are best when multiple repositories need the same onboarding flow,
+  not when the main asset is the built environment itself.
 
 ## Pipeline guidance
 
 - Start with a simple custom image publishing pipeline in this repository.
-- Reuse ideas from `external/images`, but do not copy the whole upstream maintenance model unless you actually need that scale.
+- Reuse ideas from `external/images`, but do not copy the whole upstream
+  maintenance model unless you actually need that scale.
 - Keep the first pipeline narrow: build, smoke test, tag, and publish `base`, `python`, and `fw-dev`.
 - After the images stabilize, add one or two templates only if you want easy project bootstrap for consumers.
 

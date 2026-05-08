@@ -12,9 +12,17 @@ help:       	## Show this help.
 .PHONY: github-action-list
 github-action-list:	## ✅List Workflows
 	@echo "📋 List Push Workflows"
-	@act push --list
+	@for workflow in .github/workflows/*.yml .github/workflows/*.yaml; do \
+		if grep -Eq '^[[:space:]]*push:' "$$workflow"; then \
+			echo "$$workflow"; \
+		fi; \
+	done
 	@echo "📋 List Pull Request Workflows"
-	@act pull_request --list
+	@for workflow in .github/workflows/*.yml .github/workflows/*.yaml; do \
+		if grep -Eq '^[[:space:]]*pull_request:' "$$workflow"; then \
+			echo "$$workflow"; \
+		fi; \
+	done
 
 .PHONY: github-action-act-test
 github-action-act-test:	## ✅Run act-test

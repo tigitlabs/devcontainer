@@ -71,7 +71,8 @@ Current focus is a single published base image. Additional project-specific imag
 
 ## Local build and test
 
-Local builds require either a preinstalled `devcontainer` CLI or Node.js 20+ with `npm` so the helper script can install `@devcontainers/cli`.
+Local builds require either a preinstalled `devcontainer` CLI or Node.js 20+
+with `npm` so the helper script can install `@devcontainers/cli`.
 
 ```bash
 make build-base-ubuntu
