@@ -3,7 +3,7 @@
         "dockerfile": "./Dockerfile",
         "context": ".",
         "args": {
-            "VARIANT": "${localEnv:VARIANT:22.04}"
+            "VARIANT": "${localEnv:VARIANT:24.04}"
         }
     },
     "features": {
