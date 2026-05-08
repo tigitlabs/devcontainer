@@ -4,7 +4,6 @@
 echo "🧪 Running act tests $1 🧪"
 
 DEBUG_WORKFLOW_FILE=".github/workflows/debug.yml"
-MARKDOWN_WORKFLOW_FILE=".github/workflows/docs.yml"
 PUBLISH_WORKFLOW_FILE=".github/workflows/publish.yml"
 ACT_WORKFLOW_FILE=".github/workflows/act.yml"
 MAKEFILE_WORKFLOW_FILE=".github/workflows/makefile-ci.yml"
@@ -67,7 +66,6 @@ function act_dryrun_event {
 function act_dryrun_all {
     echo "🧪🧪🧪 Testing all workflows with dryrun 🧪🧪🧪"
     act_dryrun "${MAKEFILE_WORKFLOW_FILE}"
-    act_dryrun "${MARKDOWN_WORKFLOW_FILE}"
     act_dryrun "${SMOKETEST_BASE_UBUNTU_WORKFLOW_FILE}"
     act_dryrun "${ACT_WORKFLOW_FILE}"
     # TODO this fails

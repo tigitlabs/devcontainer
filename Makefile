@@ -44,8 +44,10 @@ github-action-makefile-ci:	## ✅Run makefile-ci
 
 .PHONY: github-action-markdown-lint
 github-action-markdown-lint:	## ✅Run markdown-lint
-	act -W .github/workflows/docs.yml \
-	--secret GITHUB_TOKEN=${GITHUB_TOKEN}
+	@if ! command -v pre-commit >/dev/null 2>&1; then \
+		python3 -m pip install --user pre-commit; \
+	fi
+	@PATH="$$HOME/.local/bin:$$PATH" pre-commit run markdownlint --all-files
 
 .PHONY: github-action-publish
 github-action-publish:	## ✅Build and publish all images

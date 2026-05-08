@@ -19,8 +19,6 @@ Best starting point to adapt the repository to your needs is by understanding th
 - debug.yml  
    Prints debug information of the event that triggered the Workflow run. Also dumbs the the github.event object as a json.
    This outputs can be used to debug Workflows locally by adding this outputs as event files.
-- docs.yml  
-   Markdown linting
 - makefile-ci.yml
 - publish.yml  
    Builds and tests the base image in CI, and publishes it to GitHub Container Registry on branch or tag pushes.
@@ -31,6 +29,12 @@ Best starting point to adapt the repository to your needs is by understanding th
 
 Used to run Github Actions locally.
 github.com/nectos/act
+
+Markdown linting is now run through the repository's `pre-commit` configuration:
+
+```bash
+make github-action-markdown-lint
+```
 
 #### Event files
 
