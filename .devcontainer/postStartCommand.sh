@@ -7,7 +7,13 @@ if [[ -n "${CODESPACES}" || -n "${GITHUB_CODESPACE_TOKEN}" ]]; then
     exit 0
 else
     echo "Running on local host"
+    env_file=".devcontainer/.env"
+    if [[ ! -f "${env_file}" ]]; then
+        echo "${env_file} does not exist."
+        exit 1
+    fi
     set -o allexport
+    # shellcheck disable=SC1091
     source .devcontainer/.env
     set +o allexport
     echo "🧪 Login status for github cli"
