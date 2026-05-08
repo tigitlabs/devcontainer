@@ -19,9 +19,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     # Clean up
     && apt-get autoremove -y && apt-get clean -y
 
+# Install mise
 USER vscode
 
-# Install mise
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # ENV MISE_VERSION="..."
 ENV MISE_BIN_DIR="/home/vscode/.local/bin"
