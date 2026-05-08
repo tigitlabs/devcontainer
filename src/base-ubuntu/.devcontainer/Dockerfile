@@ -1,10 +1,8 @@
 # [Choice] Ubuntu version (use jammy on local arm64/Apple Silicon): jammy, focal
-ARG VARIANT="${VARIANT}"
-ARG BASE_IMAGE=buildpack-deps:${VARIANT}-curl
-FROM ${BASE_IMAGE}
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 ARG VARIANT="${VARIANT}"
-ARG BASE_IMAGE=buildpack-deps:${VARIANT}-curl
+ARG BASE_IMAGE=mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 ENV BASE_IMAGE="${BASE_IMAGE}"
 
 LABEL dev.containers.features="common"
