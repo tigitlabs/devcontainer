@@ -14,5 +14,27 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     make \
     bash-completion \
+    age \
+    ripgrep \
     # Clean up
     && apt-get autoremove -y && apt-get clean -y
+
+USER vscode
+
+# Install mise
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# ENV MISE_VERSION="..."
+ENV MISE_BIN_DIR="/home/vscode/.local/bin"
+ENV MISE_INSTALL_PATH="/home/vscode/.local/bin/mise"
+ENV MISE_DATA_DIR="/home/vscode/.local/share/mise"
+ENV MISE_CONFIG_DIR="/home/vscode/.config/mise"
+ENV MISE_CACHE_DIR="/home/vscode/.cache/mise"
+
+ENV PATH="${MISE_BIN_DIR}:${MISE_DATA_DIR}/shims:${PATH}"
+
+RUN mkdir -p \
+    "${MISE_BIN_DIR}" \
+    "${MISE_DATA_DIR}" \
+    "${MISE_CONFIG_DIR}" \
+    "${MISE_CACHE_DIR}" \
+    && curl https://mise.run | sh
