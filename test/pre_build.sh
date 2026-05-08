@@ -11,15 +11,15 @@ export DOCKER_BUILDKIT=1
 
 # Install devcontainer cli if not already installed
 # Thats the case when running on GitHub Actions Runner
-if ! command -v devcontainer &> /dev/null; then
-    if command -v npm &> /dev/null; then
-        if ! command -v node &> /dev/null; then
+if ! command -v devcontainer &>/dev/null; then
+    if command -v npm &>/dev/null; then
+        if ! command -v node &>/dev/null; then
             echo "🚫 node is required to install @devcontainers/cli"
             exit 1
         fi
 
         node_major=$(node -p 'process.versions.node.split(".")[0]')
-        if (( node_major < 20 )); then
+        if ((node_major < 20)); then
             echo "🚫 Node.js 20 or newer is required to install @devcontainers/cli"
             echo "   Current version: $(node --version)"
             exit 1
@@ -27,7 +27,7 @@ if ! command -v devcontainer &> /dev/null; then
 
         echo "(*) Installing @devcontainer/cli"
         if ! npm install -g @devcontainers/cli; then
-            if command -v sudo &> /dev/null; then
+            if command -v sudo &>/dev/null; then
                 sudo npm install -g @devcontainers/cli
             else
                 echo "🚫 Unable to install @devcontainers/cli globally"
@@ -61,12 +61,11 @@ else
 fi
 
 image_name="${IMAGE}:${TAG}"
-id_label=" dev.containers.name=${IMAGE}"
 
 echo "(*) Building image - ${image_name}"
 
 devcontainer build --workspace-folder "src/${IMAGE}/" --image-name "${image_name}"
-image_id=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep ${image_name} | awk '{print $2}')
-image_size=$(docker images --format "{{.Repository}}:{{.Tag}} {{.Size}}" | grep ${image_name} | awk '{print $2}')
+image_id=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep -F -- "${image_name}" | awk '{print $2}')
+image_size=$(docker images --format "{{.Repository}}:{{.Tag}} {{.Size}}" | grep -F -- "${image_name}" | awk '{print $2}')
 echo "(*) Image size - ${image_size}"
 echo "(*) Image id - ${image_id}"

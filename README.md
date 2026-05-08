@@ -19,8 +19,6 @@ Best starting point to adapt the repository to your needs is by understanding th
 - debug.yml  
    Prints debug information of the event that triggered the Workflow run. Also dumbs the the github.event object as a json.
    This outputs can be used to debug Workflows locally by adding this outputs as event files.
-- docs.yml  
-   Markdown linting
 - makefile-ci.yml
 - publish.yml  
    Builds and tests the base image in CI, and publishes it to GitHub Container Registry on branch or tag pushes.
@@ -31,6 +29,12 @@ Best starting point to adapt the repository to your needs is by understanding th
 
 Used to run Github Actions locally.
 github.com/nectos/act
+
+Markdown linting is now run through the repository's `pre-commit` configuration:
+
+```bash
+make github-action-markdown-lint
+```
 
 #### Event files
 
@@ -78,6 +82,23 @@ with `npm` so the helper script can install `@devcontainers/cli`.
 make build-base-ubuntu
 make test-base-ubuntu
 ```
+
+## Pre-commit
+
+The development container already installs the `pre-commit` tool. The repository
+now also includes a pinned `.pre-commit-config.yaml` for the file types that are
+actually maintained here: shell scripts, Dockerfiles, GitHub Actions workflows,
+YAML/JSON, and Markdown.
+
+If you are not using the devcontainer, install `pre-commit` locally and then run:
+
+```bash
+pre-commit install --install-hooks
+pre-commit run --all-files
+```
+
+When you open the repo in the devcontainer, `.devcontainer/postCreateCommand.sh`
+installs the git hook automatically.
 
 ## Using the published image
 

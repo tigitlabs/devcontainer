@@ -15,7 +15,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     age \
     ripgrep \
     # Clean up
-    && apt-get autoremove -y && apt-get clean -y
+    && apt-get autoremove -y && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install mise
 USER vscode

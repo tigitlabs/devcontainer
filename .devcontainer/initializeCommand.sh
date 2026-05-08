@@ -8,8 +8,7 @@ if [[ -n "${CODESPACES}" || -n "${GITHUB_CODESPACE_TOKEN}" ]]; then
 else
     echo "Running on local host"
     echo "Check if gh is installed"
-    if ! command -v gh &> /dev/null
-    then
+    if ! command -v gh &>/dev/null; then
         echo "gh could not be found"
         exit 1
     else
@@ -18,8 +17,7 @@ else
     fi
 
     echo "Check if gh is logged in"
-    if ! gh auth status | grep -q "Logged in to github.com"
-    then
+    if ! gh auth status | grep -q "Logged in to github.com"; then
         echo "gh is not logged in"
         exit 1
     else
@@ -28,8 +26,8 @@ else
     fi
 
     echo "Write environment variables to .devcontainer/.env file"
-    echo "GITHUB_TOKEN=$(gh config get oauth_token --host github.com)" > .devcontainer/.env
-    echo "GITHUB_USER=$(gh api user | jq -r '.login')" >> .devcontainer/.env
+    echo "GITHUB_TOKEN=$(gh config get oauth_token --host github.com)" >.devcontainer/.env
+    echo "GITHUB_USER=$(gh api user | jq -r '.login')" >>.devcontainer/.env
 
     if [ -z "$SSH_AUTH_SOCK" ]; then
         echo "SSH_AUTH_SOCK is not set"
