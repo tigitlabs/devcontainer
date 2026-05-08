@@ -1,7 +1,7 @@
 #!/bin/bash
 cd $(dirname "$0")
 
-source ../../../test/test-utils.sh  ubuntu
+source ../../../test/test-utils.sh  vscode
 
 # Run common tests
 checkCommon
