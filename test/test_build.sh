@@ -27,7 +27,7 @@ docker run \
 --sig-proxy=false \
 --name "${IMAGE}" \
 --detach \
---mount type=bind,source="${absolute_root_dir}",target=/workspaces/dev-container \
+--mount type=bind,source="${absolute_root_dir}",target=/workspaces/devcontainer \
 --label ${id_label} \
 --entrypoint /bin/sh ${image_name} -c 'trap "exit 0" 15; exec "$@"; while sleep 1 & wait $!; do :; done'
 

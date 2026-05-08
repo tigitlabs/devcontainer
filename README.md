@@ -23,7 +23,7 @@ Best starting point to adapt the repository to your needs is by understanding th
    Markdown linting
 - makefile-ci.yml
 - publish.yml  
-   Publishes the devcontainer images to the Github Container Registry
+   Builds and tests the base image in CI, and publishes it to GitHub Container Registry on branch or tag pushes.
 - smoke-***
    Smoke tests for the devcontainer images
 
@@ -39,9 +39,9 @@ The event files are located in the `.github/workflows/act` folder.
 Example usage:
 
 ```bash
-   act create \
+   act push \
    --workflows .github/workflows/publish.yml \
-   --eventpath .github/workflows/act/event-create-tag.json \
+   --eventpath .github/workflows/act/event-push-commit.json \
    --dryrun
 ```
 
@@ -62,44 +62,34 @@ This enables SSH access to a Github Actions runner.
 
 Current focus is a single published base image. Additional project-specific images will be added later on top of this foundation.
 
-## Setup for Host Machine
+## Build and publish flow
 
-Requirements are that you have the Github CLI installed and the client is authenticated.
-If you are using SSH Keys to perform git actions, check the SSH Agent sections.
+- Pull requests to `dev` or `main` build and test `base-ubuntu` but do not publish.
+- Pushes to `dev` and `main` build, test, and publish branch tags plus a `sha-<commit>` tag.
+- Pushes to `main` also publish `latest`.
+- Semver tags like `v1.2.3` publish `v1.2.3`, `v1.2`, `v1`, `latest`, and `sha-<commit>`.
 
-### SSH Agent
+## Local build and test
 
-(Documentation)<https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials>
-
-This is only required if you want to use SSH to authenticate with Github.
-If you are using HTTPS, then you can skip this section.
-
-When creating the devcontainer, and you want to use the ssh agent forwarding,
-for Github, you need to add the following to your `~/.ssh/config` file:
+Local builds require either a preinstalled `devcontainer` CLI or Node.js 20+ with `npm` so the helper script can install `@devcontainers/cli`.
 
 ```bash
-# Github
-Host github.com
-  HostName github.com
-  PreferredAuthentications publickey
-  User git
-  AddKeysToAgent yes
-  IdentityFile ~/.ssh/id_rsa
-  ForwardAgent yes
+make build-base-ubuntu
+make test-base-ubuntu
 ```
 
-In your `~/.bashrc` file add the following:
+## Using the published image
 
-```bash
-# SSH Agent
-# https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials
-if [ -z "$SSH_AUTH_SOCK" ]; then
-   # Check for a currently running instance of the agent
-   RUNNING_AGENT="`ps -ax | grep 'ssh-agent -s' | grep -v grep | wc -l | tr -d '[:space:]'`"
-   if [ "$RUNNING_AGENT" = "0" ]; then
-        # Launch a new instance of the agent
-        ssh-agent -s &> $HOME/.ssh/ssh-agent
-   fi
-   eval `cat $HOME/.ssh/ssh-agent`
-fi
+Example `.devcontainer/devcontainer.json` using the published image directly:
+
+```json
+{
+   "image": "ghcr.io/tigitlabs/devcontainer/base-ubuntu:main",
+   "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+         "installZsh": "false",
+         "username": "vscode"
+      }
+   }
+}
 ```

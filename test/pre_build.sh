@@ -12,8 +12,34 @@ export DOCKER_BUILDKIT=1
 # Install devcontainer cli if not already installed
 # Thats the case when running on GitHub Actions Runner
 if ! command -v devcontainer &> /dev/null; then
-    echo "(*) Installing @devcontainer/cli"
-    npm install -g @devcontainers/cli
+    if command -v npm &> /dev/null; then
+        if ! command -v node &> /dev/null; then
+            echo "🚫 node is required to install @devcontainers/cli"
+            exit 1
+        fi
+
+        node_major=$(node -p 'process.versions.node.split(".")[0]')
+        if (( node_major < 20 )); then
+            echo "🚫 Node.js 20 or newer is required to install @devcontainers/cli"
+            echo "   Current version: $(node --version)"
+            exit 1
+        fi
+
+        echo "(*) Installing @devcontainer/cli"
+        if ! npm install -g @devcontainers/cli; then
+            if command -v sudo &> /dev/null; then
+                sudo npm install -g @devcontainers/cli
+            else
+                echo "🚫 Unable to install @devcontainers/cli globally"
+                echo "   Retry with a user that can write global npm packages or preinstall the CLI"
+                exit 1
+            fi
+        fi
+    else
+        echo "🚫 devcontainer cli not found and npm is not available to install it"
+        echo "   Install Node.js/npm or preinstall @devcontainers/cli before running local builds"
+        exit 1
+    fi
 else
     echo "(*) @devcontainer/cli already installed"
 fi
