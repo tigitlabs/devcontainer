@@ -58,7 +58,7 @@ github-action-publish:	## ✅Build and publish all images
 
 .PHONY: build-base-ubuntu
 build-base-ubuntu:	## 🏗️Build ubuntu-base image
-	@echo "🏗️ Building base-ubuntu image"	
+	@echo "🏗️ Building base-ubuntu image"
 	./test/pre_build.sh base-ubuntu local
 
 .PHONY: test-base-ubuntu

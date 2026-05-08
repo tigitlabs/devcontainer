@@ -10,7 +10,7 @@ on:
       - .github/workflows/smoke-base-ubuntu.yaml
       - .github/actions/**
 
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
@@ -22,7 +22,7 @@ jobs:
 
     - name: Checkout
       id: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Smoke test
       env:

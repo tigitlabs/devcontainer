@@ -79,6 +79,23 @@ make build-base-ubuntu
 make test-base-ubuntu
 ```
 
+## Pre-commit
+
+The development container already installs the `pre-commit` tool. The repository
+now also includes a pinned `.pre-commit-config.yaml` for the file types that are
+actually maintained here: shell scripts, Dockerfiles, GitHub Actions workflows,
+YAML/JSON, and Markdown.
+
+If you are not using the devcontainer, install `pre-commit` locally and then run:
+
+```bash
+pre-commit install --install-hooks
+pre-commit run --all-files
+```
+
+When you open the repo in the devcontainer, `.devcontainer/postCreateCommand.sh`
+installs the git hook automatically.
+
 ## Using the published image
 
 Example `.devcontainer/devcontainer.json` using the published image directly:

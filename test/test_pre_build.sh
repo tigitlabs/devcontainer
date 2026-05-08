@@ -13,8 +13,9 @@ function check_label() {
     local image="$1"
     local label="$2"
     local expected_value="$3"
+    local actual_value
     echo "🧪 Checking label ${label} for image ${image}"
-    local actual_value=$(docker inspect "${image}" | jq -r ".[0].Config.Labels.\"${label}\"")
+    actual_value=$(docker inspect "${image}" | jq -r ".[0].Config.Labels.\"${label}\"")
     if [[ "${actual_value}" != "${expected_value}" ]]; then
         echo "❌ Expected label ${label} to be ${expected_value}, but got ${actual_value}"
         exit 1
@@ -25,16 +26,18 @@ function check_label() {
 }
 
 function run_build() {
-    local image=${1}
-    local tag=${2}
-    local base_image=${3}
+    local image="${1}"
+    local tag="${2:-local}"
+    local base_image="${3:-}"
+    local result
+    local image_size
+    local image_size_tag='(*) Image size - '
     echo "🏃 Running build for image ${image}:${tag} and base image ${base_image}:${tag}"
 
-    local result=$(${build_script} "${image}" "${tag}" "${base_image}" 2>&1)
+    result=$("${build_script}" "${image}" "${tag}" "${base_image}" 2>&1)
 
-    local IMAGE_SIZE_TAG='(*) Image size - '
-    local IMAGE_SIZE=$(echo "${result}" | grep "${IMAGE_SIZE_TAG}")
-    if [[ -z "${IMAGE_SIZE}" ]]; then
+    image_size=$(echo "${result}" | grep -F "${image_size_tag}")
+    if [[ -z "${image_size}" ]]; then
         echo "❌ Build failed"
         echo "${result}"
         exit 1

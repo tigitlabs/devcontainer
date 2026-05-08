@@ -24,9 +24,6 @@ on:
   merge_group:
   milestone:
   page_build:
-  project:
-  project_card:
-  project_column:
   public:
   registry_package:
   release:
@@ -35,48 +32,74 @@ jobs:
   event_details:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Print environment
         uses: hmarr/debug-action@v2.1.0
 
       - name: pull_request
         if: github.event_name == 'pull_request'
+        env:
+          EVENT_ACTION: ${{ github.event.action }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_ASSIGNEE_LOGIN: ${{ github.event.assignee.login }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_STATE: ${{ github.event.pull_request.state }}
+          PR_LOCKED: ${{ github.event.pull_request.locked }}
+          PR_ACTIVE_LOCK_REASON: ${{ github.event.pull_request.active_lock_reason }}
+          PR_AUTO_MERGE_METHOD: ${{ github.event.pull_request.auto_merge.method }}
         run: |
           echo "GITHUB_EVENT_NAME=${{ github.event_name }}"
           # https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
-          echo "action: ${{ github.event.action }}"
-          echo "title: ${{ github.event.pull_request.title }}"
-          echo "ℹ Pull request from ${{ github.event.pull_request.head.ref }} to ${{ github.event.pull_request.base.ref }}"
-          echo "assignee.login: ${{ github.event.assignee.login }}"
-          echo "merged: ${{ github.event.pull_request.merged }}"
-          echo "number: ${{ github.event.pull_request.number }}"
-          echo "state: ${{ github.event.pull_request.state }}"
-          echo "base.ref": ${{ github.event.pull_request.base.ref }}
-          echo "head.ref: ${{ github.event.pull_request.head.ref }}"
-          echo "locked: ${{ github.event.pull_request.locked }}"
-          echo "active_lock_reason: ${{ github.event.pull_request.active_lock_reason }}"
-          echo "auto_merge.method: ${{ github.event.pull_request.auto_merge.method }}"
+          echo "action: ${EVENT_ACTION}"
+          echo "title: ${PR_TITLE}"
+          echo "ℹ Pull request from ${PR_HEAD_REF} to ${PR_BASE_REF}"
+          echo "assignee.login: ${PR_ASSIGNEE_LOGIN}"
+          echo "merged: ${PR_MERGED}"
+          echo "number: ${PR_NUMBER}"
+          echo "state: ${PR_STATE}"
+          echo "base.ref: ${PR_BASE_REF}"
+          echo "head.ref: ${PR_HEAD_REF}"
+          echo "locked: ${PR_LOCKED}"
+          echo "active_lock_reason: ${PR_ACTIVE_LOCK_REASON}"
+          echo "auto_merge.method: ${PR_AUTO_MERGE_METHOD}"
 
       - name: push
         if: github.event_name == 'push'
+        env:
+          PUSH_AFTER: ${{ github.event.after }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_BASE_REF: ${{ github.event.base_ref }}
+          PUSH_COMPARE: ${{ github.event.compare }}
+          PUSH_CREATED: ${{ github.event.created }}
+          PUSH_DELETED: ${{ github.event.deleted }}
+          PUSH_DESCRIPTION: ${{ github.event.description }}
+          PUSH_FORCED: ${{ github.event.forced }}
+          PUSH_HEAD_COMMIT_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
+          PUSH_HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          PUSH_PUSHER_NAME: ${{ github.event.pusher.name }}
+          PUSH_REF: ${{ github.event.ref }}
+          PUSH_REPOSITORY_FULL_NAME: ${{ github.event.repository.full_name }}
+          PUSH_SENDER_LOGIN: ${{ github.event.sender.login }}
         run: |
           echo "GITHUB_EVENT_NAME=${{ github.event_name }}"
           # https://docs.github.com/en/webhooks/webhook-events-and-payloads#push
-          echo "after: ${{ github.event.after }}"
-          echo "before: ${{ github.event.before }}"
-          echo "base_ref: ${{ github.event.base_ref }}"
-          echo "commits.author.name: ${{ github.event.commits.author.name }}"
-          echo "compare: ${{ github.event.compare }}"
-          echo "created: ${{ github.event.created }}"
-          echo "deleted: ${{ github.event.deleted }}"
-          echo "description: ${{ github.event.description }}"
-          echo "forced: ${{ github.event.forced }}"
-          echo "head_commit.author.name: ${{ github.event.head_commit.author.name }}"
-          echo "head_commit.message: ${{ github.event.head_commit.message }}"
-          echo "pusher.name: ${{ github.event.pusher.name }}"
-          echo "ref: ${{ github.event.ref }}"
-          echo "repository.full_name: ${{ github.event.repository.full_name }}"
-          echo "sender.login: ${{ github.event.sender.login }}"
+          echo "after: ${PUSH_AFTER}"
+          echo "before: ${PUSH_BEFORE}"
+          echo "base_ref: ${PUSH_BASE_REF}"
+          echo "compare: ${PUSH_COMPARE}"
+          echo "created: ${PUSH_CREATED}"
+          echo "deleted: ${PUSH_DELETED}"
+          echo "description: ${PUSH_DESCRIPTION}"
+          echo "forced: ${PUSH_FORCED}"
+          echo "head_commit.author.name: ${PUSH_HEAD_COMMIT_AUTHOR_NAME}"
+          echo "head_commit.message: ${PUSH_HEAD_COMMIT_MESSAGE}"
+          echo "pusher.name: ${PUSH_PUSHER_NAME}"
+          echo "ref: ${PUSH_REF}"
+          echo "repository.full_name: ${PUSH_REPOSITORY_FULL_NAME}"
+          echo "sender.login: ${PUSH_SENDER_LOGIN}"
       - name: create
         if: github.event_name == 'create'
         run: |

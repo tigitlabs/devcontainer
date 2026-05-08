@@ -13,9 +13,9 @@ else
     echo "🧪 Login status for github cli"
     gh auth status
     echo "🧪 Login docker to ghcr.io for: ${GITHUB_USER}"
-    echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin
+    printf '%s\n' "${GITHUB_TOKEN}" | docker login ghcr.io -u "${GITHUB_USER}" --password-stdin
     echo "🧪 Check github access via SSH"
     # Add github.com to known_hosts
-    ssh-keyscan github.com >> ~/.ssh/known_hosts
+    ssh-keyscan github.com >>~/.ssh/known_hosts
     ssh -T git@github.com
 fi
