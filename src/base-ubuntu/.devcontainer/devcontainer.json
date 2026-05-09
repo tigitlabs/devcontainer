@@ -18,6 +18,7 @@
         },
         "ghcr.io/devcontainers/features/python:1": {}
     },
+    "containerUser": "root",
     "remoteUser": "vscode",
     "updateRemoteUserUID": true
 }
