@@ -37,3 +37,5 @@ RUN mkdir -p \
     "${MISE_CONFIG_DIR}" \
     "${MISE_CACHE_DIR}" \
     && curl https://mise.run | sh
+
+USER root
