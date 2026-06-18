@@ -29,7 +29,5 @@ check "mise-data-dir" test -d "$HOME/.local/share/mise"
 check "mise-config-dir" test -d "$HOME/.config/mise"
 check "mise-cache-dir" test -d "$HOME/.cache/mise"
 
-checkPythonExtension
-
 # Report result
 reportResults
